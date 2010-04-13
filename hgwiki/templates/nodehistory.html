@@ -1,0 +1,35 @@
+$# hgwiki, Copyright (c) 2010, R. P. Dillon <rpdillon@etherplex.org>
+$# This file is part of hgwiki.
+$#
+$# hgwiki is free software: you can redistribute it and/or modify
+$# it under the terms of the GNU General Public License as published by
+$# the Free Software Foundation, either version 3 of the License, or
+$# (at your option) any later version.
+$#
+$# This program is distributed in the hope that it will be useful,
+$# but WITHOUT ANY WARRANTY; without even the implied warranty of
+$# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+$# GNU General Public License for more details.
+$#
+$# You should have received a copy of the GNU General Public License
+$# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+$def with (datetime, node, revs, repo)
+
+<h4>Revisions in which $node changed:</h4>
+
+<table cellspacing=10>
+  $for r in revs:
+      $if node in repo[r].files():
+          <tr>
+	    <td>$r</td>
+	    $if node in repo[r]:
+                <td><a href="/$node?rev=$r">View</a></td>
+	        <td><a href="/recover/$node?rev=$r">Recover</a></td>
+	    $else:
+                <td style="color: ccc">View</td>
+                <td style="color: ccc">Recover</td>
+            <td>$datetime.fromtimestamp(repo[r].date()[0]).isoformat()</td>
+            <td>$repo[r].description()</td>
+          </tr>
+</table>

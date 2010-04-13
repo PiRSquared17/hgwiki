@@ -1,0 +1,93 @@
+$# hgwiki, Copyright (c) 2010, R. P. Dillon <rpdillon@etherplex.org>
+$# This file is part of hgwiki.
+$#
+$# hgwiki is free software: you can redistribute it and/or modify
+$# it under the terms of the GNU General Public License as published by
+$# the Free Software Foundation, either version 3 of the License, or
+$# (at your option) any later version.
+$#
+$# This program is distributed in the hope that it will be useful,
+$# but WITHOUT ANY WARRANTY; without even the implied warranty of
+$# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+$# GNU General Public License for more details.
+$#
+$# You should have received a copy of the GNU General Public License
+$# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+$def with (node, doc, editPrivilege)
+<html>
+  <head>
+    <script type="text/javascript" src="/lib/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
+    <script type="text/javascript" src="/lib/dijit/dijit.js"></script>
+    <script type="text/javascript">
+      dojo.require("dijit.Dialog")
+      dojo.require("dijit.layout.ContentPane")
+      dojo.require("dijit.layout.BorderContainer")
+      dojo.require("dijit.form.Form")
+      dojo.require("dijit.form.Textarea")
+      dojo.require("dijit.form.TextBox")
+      dojo.require("dijit.form.Button")
+      dojo.require("dijit.Tooltip")
+    </script>
+    <link rel="stylesheet" type="text/css" href="/lib/dijit/themes/tundra/tundra.css"/>
+    <style type="text/css">
+      #borderContainer { width:80%; height:100%; max-width: 900px;}
+      :link    { color: rgb(0, 0, 0); }
+      :visited { color: rgb(0, 0, 0); }
+      .nav td { color: #fff; background-color: #888; padding: 2px; }
+      .nav td:hover{ background-color: #d71 }
+    </style>
+  </head>
+  <body class="tundra" style="background-color:#eeeeee";>
+
+    <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="true" liveSplitters="false" id="borderContainer" style="margin:0 auto">
+
+      $# Header
+      <div align="center" dojoType="dijit.layout.ContentPane" splitter="false" region="top" style="font-size: 150%; background-color: #4444ee; padding: 5px; color: #ffffff; border: 1px solid #000000;">
+        <big><strong><a style="text-decoration:none; color: #fff" href="/$node">$node</a></strong></big>
+      </div>
+
+      $# Sidebar
+      <div dojoType="dijit.layout.ContentPane" splitter="false" region="leading" style="padding: 5px; border:1px solid; background-color: #ccc">
+        <table cellspacing="4" class="nav">
+          <tr><td align="center"><a id="home" style="text-decoration:none; color: #fff;" href="/">Home</a></td></tr>
+          <tr><td align="center"><a id="history" style="text-decoration:none; color: #fff;" href="/history/$(node)">History</a></td></tr>
+          <tr><td align="center"><a id="index" style="text-decoration:none; color: #fff;" href="/PageIndex">Index</a></td></tr>
+          $if editPrivilege:
+              <tr><td align="center"><a id="new" style="text-decoration:none; color: #fff;" href="javascript:dijit.byId('createpage').show()">New</a></td></tr>
+              <tr><td align="center"><a id="edit" style="text-decoration:none; color: #fff;" href="/edit/$(node)">Edit</a></td></tr>
+              <tr><td align="center"><a id="delete" style="text-decoration:none; color: #fff;" href="/delete/$(node)">Delete</a></td></tr>
+        </table>
+      </div>
+
+      $# Sidebar tooltips
+      <div dojoType="dijit.Tooltip" connectId="home" position="above">Go back to the main page</div>
+      <div dojoType="dijit.Tooltip" connectId="history" position="above">View the history of changes for this page</div>
+      <div dojoType="dijit.Tooltip" connectId="index" position="above">View a list of all pages in the wiki</div>
+
+      $if editPrivilege:
+          <div dojoType="dijit.Tooltip" connectId="new" position="above">Create a new page</div>
+          <div dojoType="dijit.Tooltip" connectId="edit" position="above">Edit this page</div>
+          <div dojoType="dijit.Tooltip" connectId="delete" position="above">Delete this page</div>
+
+      $# Create page dialog
+      <div id="createpage" dojoType="dijit.Dialog" title="Create Page">
+        <script type="text/javascript">
+          function create() {
+            if (window.event.keyCode == dojo.keys.ENTER) {
+              window.location.href="/" + dijit.byId("pagename").attr("value")
+            }
+          }
+        </script>
+        Create page with name:
+        <input type="text" name="pagename" value="" dojoType="dijit.form.TextBox"
+               trim="true" id="pagename" propercase="true" onkeypress="create">
+      </div>
+
+      $# Content
+	  <div dojoType="dijit.layout.ContentPane" splitter="false" region="center" style="background-color: #ffffff; padding: 5px; border: 1px solid;">
+        $:doc
+	  </div>
+    </div>
+  </body>
+</html>
