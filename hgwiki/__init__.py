@@ -20,7 +20,7 @@
 hgwiki - Provides a distributed wiki backed by merurial.
 '''
 import web
-from hgwiki import WikiContent, ReadNode, EditNode, PageIndex, DeleteNode, NodeHistory, StaticLibs, RecoverNode, Help
+from hgwiki import WikiContent, ReadNode, EditNode, PageIndex, DeleteNode, NodeHistory, StaticLibs, RecoverNode, PrintNode, Help, Upload
 from hgwiki import getExtensionPath
 
 def hgwiki(ui, repo, **opts):
@@ -30,12 +30,14 @@ def hgwiki(ui, repo, **opts):
 
     urls = (
         '/PageIndex',    'PageIndex',
+        '/upload',       'Upload',
         '/Help',         'Help',
         '/history/(.*)', 'NodeHistory',
         '/delete/(.*)',  'DeleteNode',
         '/recover/(.*)', 'RecoverNode',
         '/edit/(.*)',    'EditNode',
         '/lib/(.*)',     'StaticLibs',
+        '/print/(.*)',   'PrintNode',
         '/(.*)',         'ReadNode'
     )
 

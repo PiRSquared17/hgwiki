@@ -217,6 +217,23 @@ class ReadNode(WikiContent):
             raise web.seeother("/edit/" + node)
         return wikipage(node, doc, self._privileged())
 
+class PrintNode(WikiContent):
+    """
+    Views the provided document in a from suitable for printing.
+    """
+    def GET(self, node):
+        from docutils import core
+        revision = getParam("rev", self.rev)
+
+        # Sets the default document, in the case that is was not specified
+        if node == "": node = self.DEFAULT_PAGE
+        if node in self.repo[revision]:
+            doc = self._getNodeText(node, revision)
+            doc = core.publish_string(doc, writer_name="html4css1")
+        else:
+            raise web.seeother("/edit/" + node)
+        return doc
+
 class EditNode(WikiContent):
     def _clean(self, text):
         """
@@ -235,6 +252,7 @@ class EditNode(WikiContent):
         return text
 
     def GET(self, node):
+        if node == "": node = self.DEFAULT_PAGE
         wikipage = getTemplate('wikipage.html')
         editform = getTemplate('editform.html')
         doc = editform(node, self._getNodeText(node))
@@ -316,6 +334,49 @@ class RecoverNode(WikiContent):
         msg = "Reverted " + node + " back to revision " + revision + ". [Web Interface]"
         self._doCommit(msg)
         raise web.seeother('/' + node)        
+
+class Upload(WikiContent):
+    def GET(self):
+        web.header("Content-Type","text/html; charset=utf-8")
+        form =  """
+                 <html><head></head><body>
+                 <form method="POST" enctype="multipart/form-data" action="">
+                 <input type="file" name="fileupload" />
+                 <br/>
+                 <input type="submit" />
+                 </form>
+                 </body></html>
+                """
+        wikipage = getTemplate('wikipage.html')
+        return wikipage("Upload", form, self._privileged())
+
+    def POST(self):
+        x = web.input(fileupload={})
+        filedir =  self.repo.root + '/static/'
+
+        import os
+        if not os.path.exists(filedir):
+            os.mkdir(filedir)
+
+        # to check if the file-object is created
+        if 'fileupload' in x:
+            # replace the windows-style slashes with linux ones.
+            filepath=x.fileupload.filename.replace('\\','/') 
+            # split filepath the and choose the last part (the filename with extension)
+            filename=filepath.split('/')[-1]
+            # create the file where the uploaded file should be stored
+            completepath = filedir +'/'+ filename
+            fout = open(completepath, 'w')
+            # write the uploaded file to the newly created file.
+            fout.write(x.fileupload.file.read())
+            # close the file, upload complete.
+            fout.close()
+            
+            mercurial.commands.add(self.ui, self.repo, completepath)
+            msg = "Uploaded " + filename + "."
+            self._doCommit(msg)
+            
+        raise web.seeother('/')
 
 class WikiConfig(WikiContent):
     def GET(self):

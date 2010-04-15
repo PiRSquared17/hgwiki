@@ -41,23 +41,36 @@ $# along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </head>
   <body class="tundra" style="background-color:#eeeeee";>
 
-    <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="true" liveSplitters="false" id="borderContainer" style="margin:0 auto">
+    <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="true" 
+         liveSplitters="false" id="borderContainer" style="margin:0 auto">
 
       $# Header
-      <div align="center" dojoType="dijit.layout.ContentPane" splitter="false" region="top" style="font-size: 150%; background-color: #4444ee; padding: 5px; color: #ffffff; border: 1px solid #000000;">
+      <div align="center" dojoType="dijit.layout.ContentPane" splitter="false" region="top" 
+           style="font-size: 150%; background-color: #4444ee; padding: 5px; color: #ffffff; border: 1px solid #000000;">
         <big><strong><a style="text-decoration:none; color: #fff" href="/$node">$node</a></strong></big>
       </div>
 
       $# Sidebar
-      <div dojoType="dijit.layout.ContentPane" splitter="false" region="leading" style="padding: 5px; border:1px solid; background-color: #ccc">
+      <div dojoType="dijit.layout.ContentPane" splitter="false" region="leading" 
+           style="padding: 5px; border:1px solid; background-color: #ccc">
         <table cellspacing="4" class="nav">
-          <tr><td align="center"><a id="home" style="text-decoration:none; color: #fff;" href="/">Home</a></td></tr>
-          <tr><td align="center"><a id="history" style="text-decoration:none; color: #fff;" href="/history/$(node)">History</a></td></tr>
-          <tr><td align="center"><a id="index" style="text-decoration:none; color: #fff;" href="/PageIndex">Index</a></td></tr>
+          <tr><td align="center"><a id="home" style="text-decoration:none; color: #fff;" 
+                                    href="/">Home</a></td></tr>
+          <tr><td align="center"><a id="history" style="text-decoration:none; color: #fff;" 
+                                    href="/history/$(node)">History</a></td></tr>
+          <tr><td align="center"><a id="index" style="text-decoration:none; color: #fff;" 
+                                    href="/PageIndex">Index</a></td></tr>
+          <tr><td align="center"><a id="print" style="text-decoration:none; color: #fff;" 
+                                    href="/print/$node">Print</a></td></tr>
           $if editPrivilege:
-              <tr><td align="center"><a id="new" style="text-decoration:none; color: #fff;" href="javascript:dijit.byId('createpage').show()">New</a></td></tr>
-              <tr><td align="center"><a id="edit" style="text-decoration:none; color: #fff;" href="/edit/$(node)">Edit</a></td></tr>
-              <tr><td align="center"><a id="delete" style="text-decoration:none; color: #fff;" href="/delete/$(node)">Delete</a></td></tr>
+              <tr><td align="center"><a id="new" style="text-decoration:none; color: #fff;" 
+                                        href="javascript:dijit.byId('createpage').show()">New</a></td></tr>
+              <tr><td align="center"><a id="upload" style="text-decoration:none; color: #fff;" 
+                                        href="javascript:dijit.byId('uploaddialog').show()">Upload</a></td></tr>
+              <tr><td align="center"><a id="edit" style="text-decoration:none; color: #fff;" 
+                                        href="/edit/$(node)">Edit</a></td></tr>
+              <tr><td align="center"><a id="delete" style="text-decoration:none; color: #fff;" 
+                                        href="/delete/$(node)">Delete</a></td></tr>
         </table>
       </div>
 
@@ -65,30 +78,45 @@ $# along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <div dojoType="dijit.Tooltip" connectId="home" position="above">Go back to the main page</div>
       <div dojoType="dijit.Tooltip" connectId="history" position="above">View the history of changes for this page</div>
       <div dojoType="dijit.Tooltip" connectId="index" position="above">View a list of all pages in the wiki</div>
+      <div dojoType="dijit.Tooltip" connectId="print" position="above">View page for printing</div>
 
       $if editPrivilege:
           <div dojoType="dijit.Tooltip" connectId="new" position="above">Create a new page</div>
+          <div dojoType="dijit.Tooltip" connectId="upload" position="above">Upload a file</div>
           <div dojoType="dijit.Tooltip" connectId="edit" position="above">Edit this page</div>
           <div dojoType="dijit.Tooltip" connectId="delete" position="above">Delete this page</div>
 
-      $# Create page dialog
-      <div id="createpage" dojoType="dijit.Dialog" title="Create Page">
-        <script type="text/javascript">
-          function create() {
-            if (window.event.keyCode == dojo.keys.ENTER) {
-              window.location.href="/" + dijit.byId("pagename").attr("value")
-            }
-          }
-        </script>
-        Create page with name:
-        <input type="text" name="pagename" value="" dojoType="dijit.form.TextBox"
-               trim="true" id="pagename" propercase="true" onkeypress="create">
-      </div>
-
       $# Content
-	  <div dojoType="dijit.layout.ContentPane" splitter="false" region="center" style="background-color: #ffffff; padding: 5px; border: 1px solid;">
+	  <div dojoType="dijit.layout.ContentPane" splitter="false" region="center" 
+           style="background-color: #ffffff; padding: 5px; border: 1px solid;">
         $:doc
 	  </div>
+
+      $##########################################
+      $# Dialogs -- hidden initially
+
+      $# Create page dialog
+      <div id="createpage" dojoType="dijit.Dialog" title="Create Page">
+        Create page with name:
+        <input type="text" name="pagename" value="" dojoType="dijit.form.TextBox"
+               trim="true" id="pagename" propercase="true">
+        <button dojoType="dijit.form.Button" type="button">
+          Create
+          <script type="dojo/method" event="onClick" args="evt">
+              window.location.href="/" + dijit.byId("pagename").attr("value")
+          </script>
+        </button>
+      </div>
+
+      $# Upload Dialog
+      <div id="uploaddialog" dojoType="dijit.Dialog" title="Upload File">
+        <div dojoType="dijit.form.Form" id="uploadfile" jsId="uploadfile" encType="multipart/form-data" 
+             action="/upload" method="POST">
+          <input type="file" name="fileupload" /><br/>
+          <button dojoType="dijit.form.Button" type="submit" name="submitButton" value="Upload">Upload</button>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>
